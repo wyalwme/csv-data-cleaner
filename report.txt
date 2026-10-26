@@ -1,0 +1,13 @@
+CSV DATA CLEANING REPORT
+==============================
+Original rows: 7
+Empty rows removed: 1
+Duplicate rows removed: 1
+Clean rows remaining: 5
+
+MISSING VALUES
+------------------------------
+name: 0
+email: 1
+age: 1
+city: 0
