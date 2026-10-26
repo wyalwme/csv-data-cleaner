@@ -1,7 +1,6 @@
-
 # CSV Data Cleaner & Report Generator
 
-A Python tool that cleans CSV files and generates a summary report.
+A lightweight Python tool that cleans CSV datasets and generates a data quality report.
 
 ## Features
 
@@ -18,25 +17,34 @@ A Python tool that cleans CSV files and generates a summary report.
 - Python 3.10 or newer
 - No external libraries required
 
-## How to Use
+## How to Run
 
-1. Place your input file in the project folder.
-2. Name the input file `sample_data.csv`.
-3. Run the program:
+1. Clone or download this repository.
+2. Make sure `sample_data.csv` is in the project folder.
+3. Open a terminal in the project directory.
+4. Run:
 
-   ```bash
-   python main.py
-   ```
+```bash
+python main.py
+```
 
-4. Check the generated files:
-   - `cleaned_data.csv` — cleaned dataset
-   - `report.txt` — cleaning summary and missing-value statistics
+## Example Results
 
-## Example
+Using the included sample dataset:
 
-For the included sample dataset, the program removes one empty row and one duplicate record.
+| Metric | Result |
+|---|---:|
+| Original rows | 7 |
+| Empty rows removed | 1 |
+| Duplicate rows removed | 1 |
+| Clean rows remaining | 5 |
 
-It also identifies missing email and age values without deleting those records.
+The tool also detects missing email and age values without deleting those records.
+
+## Output Files
+
+- `cleaned_data.csv` — the cleaned dataset
+- `report.txt` — summary statistics and missing-value counts
 
 ## Project Structure
 
@@ -46,9 +54,18 @@ prjct/
 ├── sample_data.csv
 ├── cleaned_data.csv
 ├── report.txt
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 ## Limitations
 
-The current version uses a fixed input filename and removes duplicate rows only when all column values match after whitespace trimming.
+- The input filename is currently fixed as `sample_data.csv`.
+- Duplicate records are identified when all column values match after whitespace trimming.
+- Missing values are reported but not automatically filled or removed.
+
+## Future Improvements
+
+- Allow users to specify an input CSV filename
+- Add command-line arguments
+- Support exporting reports in JSON format
