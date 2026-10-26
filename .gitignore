@@ -5,3 +5,14 @@ __pycache__/
 venv/
 .env
 .vscode/
+# Generated output files
+/cleaned_data.csv
+/cleaned_data_report.txt
+/cleaned_customers.csv
+/cleaned_customers_report.txt
+/result.csv
+/result_report.txt
+/first.csv
+/second.csv
+/customers.csv
+/report.txt

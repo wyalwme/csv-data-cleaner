@@ -1,5 +1,6 @@
 
 import csv
+import sys
 from pathlib import Path
 
 
@@ -78,7 +79,50 @@ def save_report(file_path, original_count, cleaned_count,
 
 def main():
     folder = Path(__file__).parent
-    input_file = folder / "sample_data.csv"
+    args = sys.argv[1:]
+
+    input_name = "sample_data.csv"
+    output_name = "cleaned_data.csv"
+
+    i = 0
+    input_provided = False
+    output_provided = False
+
+    while i < len(args):
+        arg = args[i]
+
+        if arg == "--output":
+            if output_provided:
+                print("Error: --output can only be used once.")
+                return
+
+            if i + 1 >= len(args) or args[i + 1].startswith("--"):
+                print("Error: Please specify an output filename.")
+                return
+
+            output_name = args[i + 1]
+            output_provided = True
+            i += 2
+
+        elif arg.startswith("--"):
+            print(f"Error: Unknown argument: {arg}")
+            print("Usage: python main.py [input_file.csv] [--output output.csv]")
+            return
+
+        elif not input_provided:
+            input_name = arg
+            input_provided = True
+            i += 1
+
+        else:
+            print(f"Error: Unexpected argument: {arg}")
+            print("Usage: python main.py [input_file.csv] [--output output.csv]")
+            return
+
+    input_file = Path(input_name)
+
+    if not input_file.is_absolute():
+        input_file = folder / input_file
 
     if not input_file.exists():
         print(f"Error: File not found: {input_file.name}")
@@ -97,9 +141,28 @@ def main():
 
 
     cleaned_rows, empty_count, duplicate_count = clean_data(headers, rows)
-    output_file = folder / "cleaned_data.csv"
+
+    output_name = "cleaned_data.csv"
+
+    if "--output" in args:
+        output_index = args.index("--output")
+
+        if output_index + 1 >= len(args):
+            print("Error: Please specify an output filename.")
+            return
+
+        output_name = args[output_index + 1]
+
+    output_file = Path(output_name)
+
+    if not output_file.is_absolute():
+        output_file = folder / output_file
+
     save_csv(output_file, headers, cleaned_rows)
-    report_file = folder / "report.txt"
+
+    report_file = output_file.with_name(
+        f"{output_file.stem}_report.txt"
+    )
 
     save_report(
     report_file,
