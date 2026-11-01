@@ -142,17 +142,6 @@ def main():
 
     cleaned_rows, empty_count, duplicate_count = clean_data(headers, rows)
 
-    output_name = "cleaned_data.csv"
-
-    if "--output" in args:
-        output_index = args.index("--output")
-
-        if output_index + 1 >= len(args):
-            print("Error: Please specify an output filename.")
-            return
-
-        output_name = args[output_index + 1]
-
     output_file = Path(output_name)
 
     if not output_file.is_absolute():

@@ -16,3 +16,7 @@ venv/
 /second.csv
 /customers.csv
 /report.txt
+# Coverage reports
+.coverage
+.coverage.*
+htmlcov/

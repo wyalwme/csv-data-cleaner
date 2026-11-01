@@ -63,6 +63,137 @@ class TestCleanData(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
 
     
+    def test_repeated_output_argument(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(MAIN_FILE),
+                "customers.csv",
+                "--output",
+                "first.csv",
+                "--output",
+                "second.csv",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_DIR,
+        )
+
+        self.assertIn(
+            "Error: --output can only be used once.",
+            result.stdout,
+        )
+        self.assertFalse((PROJECT_DIR / "first.csv").exists())
+        self.assertFalse((PROJECT_DIR / "second.csv").exists())
+
+    
+    def test_unexpected_argument(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(MAIN_FILE),
+                "customers.csv",
+                "another.csv",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_DIR,
+        )
+
+        self.assertIn(
+            "Error: Unexpected argument: another.csv",
+            result.stdout,
+        )
+        self.assertEqual(result.returncode, 0)
+
+    
+    def test_csv_without_headers(self):
+        input_file = PROJECT_DIR / "test_no_headers.csv"
+
+        try:
+            input_file.write_text("", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(MAIN_FILE),
+                    "test_no_headers.csv",
+                ],
+                capture_output=True,
+                text=True,
+                cwd=PROJECT_DIR,
+            )
+
+            self.assertIn(
+                "Error: CSV headers are missing.",
+                result.stdout,
+            )
+            self.assertEqual(result.returncode, 0)
+
+        finally:
+            input_file.unlink(missing_ok=True)
+
+    
+    def test_invalid_encoding(self):
+        input_file = PROJECT_DIR / "test_invalid_encoding.csv"
+
+        try:
+            input_file.write_bytes(b"\xff\xfe\xfa")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(MAIN_FILE),
+                    "test_invalid_encoding.csv",
+                ],
+                capture_output=True,
+                text=True,
+                cwd=PROJECT_DIR,
+            )
+
+            self.assertIn(
+                "Error: Could not read CSV file:",
+                result.stdout,
+            )
+            self.assertEqual(result.returncode, 0)
+
+        finally:
+            input_file.unlink(missing_ok=True)
+
+    
+    def test_absolute_input_and_output_paths(self):
+        input_file = PROJECT_DIR / "test_absolute_input.csv"
+        output_file = PROJECT_DIR / "test_absolute_output.csv"
+        report_file = PROJECT_DIR / "test_absolute_output_report.txt"
+
+        try:
+            input_file.write_text(
+                "name,email\nAlice,alice@example.com\n",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(MAIN_FILE),
+                    str(input_file.resolve()),
+                    "--output",
+                    str(output_file.resolve()),
+                ],
+                capture_output=True,
+                text=True,
+                cwd=PROJECT_DIR,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(output_file.exists())
+            self.assertTrue(report_file.exists())
+
+        finally:
+            input_file.unlink(missing_ok=True)
+            output_file.unlink(missing_ok=True)
+            report_file.unlink(missing_ok=True)
+
     def test_custom_output_filename(self):
         output_file = PROJECT_DIR / "test_result.csv"
         report_file = PROJECT_DIR / "test_result_report.txt"
